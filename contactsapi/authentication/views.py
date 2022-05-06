@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
-from .serializers import UserSerializer
+from .serializers import UserSerializer, LoginSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
@@ -21,6 +21,8 @@ class RegisterView (GenericAPIView):
         return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(GenericAPIView):
+    serializer_class=LoginSerializer
+
     def post(self, request):
         data=request.data
         username=data.get('username', '')
@@ -28,7 +30,7 @@ class LoginView(GenericAPIView):
         user=auth.authenticate(username=username, password=password)
 
         if user:
-            auth_token=jwt.encode({'username': user.username}, settings.JWT_SECRET_KEY, algorithms="HS256")
+            auth_token=jwt.encode({'username': user.username}, settings.JWT_SECRET_KEY, algorithm="HS256")
         
             serilizer=UserSerializer(user)
 
